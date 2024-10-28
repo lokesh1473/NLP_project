@@ -1,0 +1,75 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Language Translator</title>
+    <link rel="stylesheet" href="/static/style.css">
+</head>
+<body>
+    <div class="container">
+        <h1>Language Translator</h1>
+        <form id="translator-form">
+            <label>Select Input Type:</label>
+            <select id="inputType" name="inputType" required>
+                <option value="text">Text</option>
+                <option value="pdf">PDF</option>
+                <option value="audio">Voice</option>
+            </select>
+
+            <div id="text-input" class="input-group">
+                <label>Enter Text:</label>
+                <textarea name="inputText" id="inputText" placeholder="Enter text here..."></textarea>
+            </div>
+
+            <div id="pdf-input" class="input-group" style="display: none;">
+                <label>Upload PDF:</label>
+                <input type="file" name="pdfFile" id="pdfFile" accept=".pdf">
+            </div>
+
+            <div id="audio-input" class="input-group" style="display: none;">
+                <label>Upload Audio:</label>
+                <input type="file" name="audioFile" id="audioFile" accept="audio/*">
+            </div>
+
+            <label>Choose Language:</label>
+            <input type="text" name="targetLang" placeholder="e.g., 'es' for Spanish" required>
+
+            <button type="submit">Translate</button>
+        </form>
+        
+        <div class="output-group">
+            <label>Extracted Text:</label>
+            <div id="extractedText" class="text-output"></div>
+            
+            <label>Translated Text:</label>
+            <div id="translationResult" class="text-output"></div>
+        </div>
+    </div>
+
+    <script>
+        document.getElementById('inputType').addEventListener('change', function() {
+            document.getElementById('text-input').style.display = 'none';
+            document.getElementById('pdf-input').style.display = 'none';
+            document.getElementById('audio-input').style.display = 'none';
+            document.getElementById(this.value + '-input').style.display = 'block';
+        });
+
+        document.getElementById('translator-form').addEventListener('submit', function(event) {
+            event.preventDefault();
+            const formData = new FormData(this);
+
+            fetch('/translate', {
+                method: 'POST',
+                body: formData
+            })
+            .then(response => response.json())
+            .then(data => {
+                document.getElementById('extractedText').innerText = data.extractedText || '';
+                document.getElementById('translationResult').innerText = "Translation: " + data.translation;
+            })
+            .catch(error => console.error('Error:', error));
+        });
+    </script>
+</body>
+</html>
